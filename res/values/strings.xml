@@ -1,0 +1,6 @@
+<resources>
+
+    <string name="app_name">SMS Autoresponder</string>
+    <string name="autoResponse">Please call me at my number. This device does not receive text messages / SMS messages.</string>
+
+</resources>
