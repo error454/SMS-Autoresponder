@@ -12,10 +12,12 @@ public class AutoBroadcastReceiver extends BroadcastReceiver {
 
 	private static final String TAG = "AutoBroadcastReceiver";
 
+	private static String mLastAddress = "";
+	private static String mLastMsg = "";
+	
 	@Override
 	public void onReceive(Context context, Intent intent) {
 
-		Log.i(TAG, "new call");
 		if (intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")) {
 
 			Bundle extras = intent.getExtras();
@@ -27,9 +29,23 @@ public class AutoBroadcastReceiver extends BroadcastReceiver {
 					String strMsgBody = smsmsg.getMessageBody().toString();
 					String strMsgSrc = smsmsg.getOriginatingAddress();
 					
-					//SmsManager smsManager = SmsManager.getDefault();
-					//smsManager.sendTextMessage(strMsgSrc, null, context.getString(R.string.autoResponse), null, null);
-					Log.i(TAG, "Got sms: " + i + " " + strMsgSrc);
+					if(!mLastAddress.contentEquals(strMsgSrc)
+							&& !mLastMsg.contentEquals(strMsgBody)){
+						SmsManager smsManager = SmsManager.getDefault();
+						smsManager.sendTextMessage(strMsgSrc, null, context.getString(R.string.autoResponse), null, null);
+						
+						mLastAddress = strMsgSrc;
+						mLastMsg = strMsgBody;
+						
+						Log.i(TAG, "Sending response for SMS");
+					}
+					else{
+						Log.i(TAG, "Not sending duplicate response for SMS");
+					}
+					
+					this.abortBroadcast();
+					
+					Log.i(TAG, "Got sms: " + i + " " + strMsgSrc + " " + strMsgBody);
 				}
 			}
 		} else if (intent.getAction() != null) {
